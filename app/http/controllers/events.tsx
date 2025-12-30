@@ -1,7 +1,7 @@
 
 import React from "react";
 import EventPage from "../../components/routes/EventPage";
-import Server from "../../../lib/Server";
+import Server from "../../../src/Server";
 import Event from "../../models/Event";
 import EventDetailPage from "../../components/routes/EventDetailPage";
 

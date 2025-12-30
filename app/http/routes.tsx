@@ -1,4 +1,4 @@
-import Router from "../../lib/Router";
+import Router from "../../src/Router";
 import pages from "./controllers/pages";
 import projects from "./controllers/projects";
 import events from "./controllers/events";

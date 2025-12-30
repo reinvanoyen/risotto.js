@@ -1,7 +1,7 @@
 import ProjectPage from "../../components/routes/ProjectPage";
 import React from "react";
 import DetailPage from "../../components/routes/DetailPage";
-import Server from "../../../lib/Server";
+import Server from "../../../src/Server";
 
 const projects = {
     async index() {

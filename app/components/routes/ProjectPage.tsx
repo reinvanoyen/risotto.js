@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../Layout";
 import Counter from "../ui/Counter";
-import Server from "../../../lib/Server";
+import Server from "../../../src/Server";
 
 const ProjectPage = () => {
     return (

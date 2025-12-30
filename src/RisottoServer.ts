@@ -1,17 +1,15 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import "dotenv/config";
+import express, {Express} from "express";
 import path from "path";
 import ReactDOMServer from "react-dom/server";
 import Router from "./Router";
 import { createServer as createViteServer, ViteDevServer } from "vite";
 import React from "react";
 import Server from "./Server";
-import responseCache from "./http/middleware/response-cache";
 
-export default class Application {
+export default class RisottoServer {
 
     private ssrOutlet: string = '<!--ssr-outlet-->';
-
-    private vite: ViteDevServer | null = null;
 
     private router: Router;
 
@@ -48,22 +46,26 @@ export default class Application {
         return ReactDOMServer.renderToString(component);
     }
 
-    async start(app: Express) {
+    async start(port: number = 3000, callback?: (app: Express) => void) {
 
-        this.vite = await createViteServer({
+        const expressServer = express();
+
+        const viteServer = await createViteServer({
             server: { middlewareMode: true }
         });
 
-        // Vite handles /@vite/client and module loading
-        app.use(this.vite.middlewares);
-        app.use(responseCache());
-        app.use("/static", express.static(path.join(__dirname, "../dist/static")));
+        expressServer.use(viteServer.middlewares);
+        expressServer.use("/static", express.static(path.join(__dirname, "../dist/static")));
+
+        if (callback) {
+            callback(expressServer);
+        }
 
         // Register the routes
         const urls = Object.keys(this.router.getRoutes());
 
         urls.forEach(url => {
-            app.get(url, async (req, res, next) => {
+            expressServer.get(url, async (req, res, next) => {
 
                 Server.setPath(req.path);
                 Server.setRequest(req);
@@ -72,8 +74,8 @@ export default class Application {
                 const ssrReactHtml = await this.renderRouteComponent(path);
                 const baseHtml = this.renderHtml(path);
 
-                if (this.vite) {
-                    const html = await this.vite.transformIndexHtml(req.url, baseHtml.replace(this.ssrOutlet, ssrReactHtml))
+                if (viteServer) {
+                    const html = await viteServer.transformIndexHtml(req.url, baseHtml.replace(this.ssrOutlet, ssrReactHtml))
                     res.send(html);
                     return;
                 }
@@ -82,6 +84,6 @@ export default class Application {
             });
         });
 
-        app.listen(3000);
+        expressServer.listen(port);
     }
 }

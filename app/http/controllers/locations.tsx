@@ -1,5 +1,5 @@
 import React from "react";
-import Server from "../../../lib/Server";
+import Server from "../../../src/Server";
 import LocationPage from "../../components/routes/LocationPage";
 import Location from "../../models/Location";
 import LocationDetailPage from "../../components/routes/LocationDetailPage";

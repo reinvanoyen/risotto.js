@@ -1,16 +1,15 @@
 import { JsonApi } from "@littlemissrobot/jsonapi-client";
-import Application from "./lib/Application";
+import RisottoServer from "./src/RisottoServer";
 import router from "./app/http/routes";
-import express from "express";
 
-const server = new Application(router);
+const server = new RisottoServer(router);
 
 JsonApi.init({
-    baseUrl: '***',
-    clientId: '***',
-    clientSecret: '***',
+    baseUrl: process.env.JSON_API_BASE_URL || '',
+    clientId: process.env.JSON_API_CLIENT_ID || '',
+    clientSecret: process.env.JSON_API_CLIENT_SECRET || '',
 });
 
-server.start(express());
-
-export default server;
+server.start(3000, (app) => {
+    //app.use(responseCache());
+});

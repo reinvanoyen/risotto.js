@@ -1,6 +1,7 @@
 import { Controller } from "./types/controller";
+import RouterInterface from "./contracts/RouterInterface";
 
-export default class Router {
+export default class Router implements RouterInterface {
 
     private routes: Record<string, Controller> = {};
 
