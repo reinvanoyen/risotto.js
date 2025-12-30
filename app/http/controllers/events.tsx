@@ -7,23 +7,19 @@ import EventDetailPage from "../../components/routes/EventDetailPage";
 const events = {
     async index() {
 
-        return <EventPage events={await Server.get('events', async (req) => {
+        await Server.set('events', async (req) => {
             return (await Event.query().all()).serialize();
-        })} />;
+        });
+
+        return <EventPage events={await Server.get('events')} />;
     },
     async view() {
 
-        await Server.setAll(async (req) => {
-
-            const { id } = req.params;
-
-            return {
-                id,
-                'event': (await Event.query().find(id)).serialize()
-            };
+        await Server.set('event', async (req) => {
+            return (await Event.query().find(req.params.id)).serialize();
         });
 
-        return <EventDetailPage id={await Server.get('id')} event={await Server.get('event')} />;
+        return <EventDetailPage event={await Server.get('event')} />;
     }
 };
 

@@ -1,14 +1,19 @@
 import ProjectPage from "../../components/routes/ProjectPage";
 import React from "react";
 import DetailPage from "../../components/routes/DetailPage";
-import Server from "../../../src/Server";
+import NotFound from "../../../src/errors/NotFound";
+import server from "../../../src/utils/server";
 
 const projects = {
     async index() {
 
-        await Server.set(async () => {
+        await server.only(async (req) => {
+            if (req.query.title === 'notfound') {
+                throw new NotFound();
+            }
+
             return {
-                'title': 'Nice'
+                title: req.query.title
             };
         });
 

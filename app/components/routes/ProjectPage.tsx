@@ -1,12 +1,12 @@
 import React from "react";
 import Layout from "../Layout";
 import Counter from "../ui/Counter";
-import Server from "../../../src/Server";
+import server from "../../../src/utils/server";
 
 const ProjectPage = () => {
     return (
         <Layout>
-            <h1>Projects! {Server.get('title')}</h1>
+            <h1>Projects! {server.get('title')}</h1>
             <Counter />
         </Layout>
     );

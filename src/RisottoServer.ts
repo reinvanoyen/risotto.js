@@ -6,6 +6,7 @@ import Router from "./Router";
 import { createServer as createViteServer } from "vite";
 import React from "react";
 import Server from "./Server";
+import NotFound from "./errors/NotFound";
 
 export default class RisottoServer {
 
@@ -67,19 +68,29 @@ export default class RisottoServer {
         urls.forEach(url => {
             expressServer.get(url, async (req, res, next) => {
 
-                Server.setRequest(req);
+                try {
+                    Server.setRequest(req);
 
-                const path: string = req.route.path;
-                const ssrReactHtml = await this.renderRouteComponent(path);
-                const baseHtml = this.renderHtml(path);
+                    const path: string = req.route.path;
+                    const ssrReactHtml = await this.renderRouteComponent(path);
+                    const baseHtml = this.renderHtml(path);
 
-                if (viteServer) {
-                    const html = await viteServer.transformIndexHtml(req.url, baseHtml.replace(this.ssrOutlet, ssrReactHtml))
-                    res.send(html);
-                    return;
+                    if (viteServer) {
+                        const html = await viteServer.transformIndexHtml(req.url, baseHtml.replace(this.ssrOutlet, ssrReactHtml))
+                        res.send(html);
+                        return;
+                    }
+
+                    res.send(baseHtml.replace(this.ssrOutlet, ssrReactHtml));
+                } catch(error) {
+                    if (error instanceof NotFound) {
+                        console.log(error);
+                        // todo implement 404 api
+                        res.send('Notfound');
+                    } else {
+                        throw error;
+                    }
                 }
-
-                res.send(baseHtml.replace(this.ssrOutlet, ssrReactHtml));
             });
         });
 

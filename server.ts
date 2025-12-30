@@ -1,6 +1,7 @@
 import { JsonApi } from "@littlemissrobot/jsonapi-client";
 import RisottoServer from "./src/RisottoServer";
 import router from "./app/http/routes";
+import responseCache from "./src/http/middleware/response-cache";
 
 JsonApi.init({
     baseUrl: process.env.JSON_API_BASE_URL || '',

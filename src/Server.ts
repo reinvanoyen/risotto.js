@@ -34,8 +34,6 @@ export default class Server {
                 ...Server.data[Server.request.path],
                 ...payload
             };
-
-            console.log('Server data', Server.data);
         }
     }
 
@@ -55,8 +53,6 @@ export default class Server {
                     ...Server.data[Server.request.path],
                     ...data
                 };
-
-                return;
             }
 
             Server.data[Server.request.path] = {
@@ -69,14 +65,8 @@ export default class Server {
     /**
      *
      * @param key
-     * @param valueCollector
      */
-    static async get(key: string, valueCollector?: (req: Request) => any) {
-
-        if (valueCollector) {
-            await Server.set(key, valueCollector);
-        }
-
+    static get(key: string) {
         if (typeof window !== 'undefined') {
             const data = (window as any).__INITIAL_DATA__;
 
