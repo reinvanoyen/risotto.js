@@ -2,19 +2,48 @@ import { Request } from "express";
 
 export default class Server {
 
-    private static path: string;
+    /**
+     * The current request
+     * @private
+     */
     private static request: Request;
+
+    // The data gathered throughout the request cycle
     private static data: Record<string, Record<string, any>> = {};
 
-    static setPath(path: string) {
-        Server.path = path;
-    }
-
+    /**
+     * Sets the request
+     * @param req
+     */
     static setRequest(req: Request) {
         Server.request = req;
     }
 
-    static async set(dataCollector: Record<string, any> | ((req: Request) => Record<string, any>)) {
+    /**
+     *
+     * @param key
+     * @param valueCollector
+     */
+    static async set(key: string, valueCollector: (req: Request) => any) {
+        if (typeof window === 'undefined') {
+
+            const payload: Record<string, any> = {};
+            payload[key] = await valueCollector(Server.request);
+
+            Server.data[Server.request.path] = {
+                ...Server.data[Server.request.path],
+                ...payload
+            };
+
+            console.log('Server data', Server.data);
+        }
+    }
+
+    /**
+     *
+     * @param dataCollector
+     */
+    static async setAll(dataCollector: Record<string, any> | ((req: Request) => Record<string, any>)) {
         if (typeof window === 'undefined') {
 
             if (typeof dataCollector === "function") {
@@ -22,26 +51,31 @@ export default class Server {
                     Server.request
                 );
 
-                Server.data[Server.path] = {
-                    ...Server.data[Server.path],
+                Server.data[Server.request.path] = {
+                    ...Server.data[Server.request.path],
                     ...data
                 };
 
                 return;
             }
 
-            Server.data[Server.path] = {
-                ...Server.data[Server.path],
+            Server.data[Server.request.path] = {
+                ...Server.data[Server.request.path],
                 ...dataCollector
             };
         }
     }
 
-    static all() {
-        return Server.data[Server.path] || {};
-    }
+    /**
+     *
+     * @param key
+     * @param valueCollector
+     */
+    static async get(key: string, valueCollector?: (req: Request) => any) {
 
-    static get(key: string) {
+        if (valueCollector) {
+            await Server.set(key, valueCollector);
+        }
 
         if (typeof window !== 'undefined') {
             const data = (window as any).__INITIAL_DATA__;
@@ -49,6 +83,13 @@ export default class Server {
             return data[key] || null;
         }
 
-        return Server.data[Server.path][key] || null;
+        return Server.data[Server.request.path][key] || null;
+    }
+
+    /**
+     *
+     */
+    static all() {
+        return Server.data[Server.request.path] || {};
     }
 }

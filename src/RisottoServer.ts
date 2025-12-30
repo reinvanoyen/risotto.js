@@ -3,7 +3,7 @@ import express, {Express} from "express";
 import path from "path";
 import ReactDOMServer from "react-dom/server";
 import Router from "./Router";
-import { createServer as createViteServer, ViteDevServer } from "vite";
+import { createServer as createViteServer } from "vite";
 import React from "react";
 import Server from "./Server";
 
@@ -67,7 +67,6 @@ export default class RisottoServer {
         urls.forEach(url => {
             expressServer.get(url, async (req, res, next) => {
 
-                Server.setPath(req.path);
                 Server.setRequest(req);
 
                 const path: string = req.route.path;

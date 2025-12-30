@@ -1,4 +1,3 @@
-
 import React from "react";
 import EventPage from "../../components/routes/EventPage";
 import Server from "../../../src/Server";
@@ -8,15 +7,13 @@ import EventDetailPage from "../../components/routes/EventDetailPage";
 const events = {
     async index() {
 
-        await Server.set(async () => ({
-            'events': (await Event.query().all()).serialize()
-        }));
-
-        return <EventPage events={Server.get('events')} />;
+        return <EventPage events={await Server.get('events', async (req) => {
+            return (await Event.query().all()).serialize();
+        })} />;
     },
     async view() {
 
-        await Server.set(async (req) => {
+        await Server.setAll(async (req) => {
 
             const { id } = req.params;
 
@@ -26,7 +23,7 @@ const events = {
             };
         });
 
-        return <EventDetailPage />;
+        return <EventDetailPage id={await Server.get('id')} event={await Server.get('event')} />;
     }
 };
 
